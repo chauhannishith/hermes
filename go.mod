@@ -1,4 +1,4 @@
-module github.com/matcornic/hermes
+module github.com/chauhannishith/hermes
 
 go 1.25
 

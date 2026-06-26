@@ -1,9 +1,8 @@
 # Hermes
 
 [![Build Status](https://github.com/chauhannishith/hermes/actions/workflows/main.yml/badge.svg)](https://github.com/chauhannishith/hermes/actions/workflows/main.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/matcornic/hermes)](https://goreportcard.com/report/github.com/matcornic/hermes)
-[![Godoc](https://godoc.org/github.com/matcornic/hermes?status.svg)](https://godoc.org/github.com/matcornic/hermes)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes?ref=badge_shield)
+[![Go Report Card](https://goreportcard.com/badge/github.com/chauhannishith/hermes)](https://goreportcard.com/report/github.com/chauhannishith/hermes)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/chauhannishith/hermes.svg)](https://pkg.go.dev/github.com/chauhannishith/hermes)
 
 > **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional greeting, signature, and unsubscribe controls. Install this fork with `go get github.com/chauhannishith/hermes`.
 
@@ -22,14 +21,17 @@ First install the package:
 go get github.com/chauhannishith/hermes
 ```
 
-## Migrate back from `v2` to `v1.3.0`
+## Migrate from upstream `matcornic/hermes`
 
-At the time of `v2` creation, Go modules logic and best practices were still unsure. v1 did not use modules.
-Having a dedicated `v2` module is meant to be used for projects hosting and maintaining `v1` and `v2` at the same time, so people can use both versions at the same time. There is no need for that in this kind of project.
-Now that go modules usage is standard, in `v1`, starting from `v1.3.0` tags, we decided to migrate back to `github.com/matcornic/hermes` instead of `github.com/matcornic/hermes/v2`.
-`v2` tags will still use `github.com/matcornic/hermes/v2` as the import path, normal way will use `github.com/matcornic/hermes` as the import path.
+This fork uses module path `github.com/chauhannishith/hermes`. If you were on the original package:
 
-So, just replace your import path from `github.com/matcornic/hermes/v2` to `github.com/matcornic/hermes` and run `go get github.com/matcornic/hermes@v1.3.0` (or newer) to update the dependency.
+```bash
+go get github.com/chauhannishith/hermes@v1.0.0
+```
+
+Replace imports from `github.com/matcornic/hermes` to `github.com/chauhannishith/hermes` in your code.
+
+If you still use the upstream `v2` module path (`github.com/matcornic/hermes/v2`), see [upstream migration notes](https://github.com/matcornic/hermes#migrate-back-from-v2-to-v130).
 
 ## Use Hermes
 
@@ -520,7 +522,3 @@ This fork runs [GitHub Actions](.github/workflows/) on every push and pull reque
 ## License
 
 Apache 2.0
-
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes?ref=badge_large)

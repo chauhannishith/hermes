@@ -11,7 +11,7 @@ import (
 	"github.com/go-gomail/gomail"
 	"golang.org/x/term"
 
-	"github.com/matcornic/hermes"
+	"github.com/chauhannishith/hermes"
 )
 
 var (
@@ -35,7 +35,7 @@ func main() {
 		Product: hermes.Product{
 			Name: "Hermes",
 			Link: "https://example-hermes.com/",
-			Logo: "https://github.com/matcornic/hermes/blob/master/examples/gopher.png?raw=true",
+			Logo: "https://github.com/chauhannishith/hermes/blob/main/examples/gopher.png?raw=true",
 		},
 	}
 	sendEmails := os.Getenv("HERMES_SEND_EMAILS") == "true"

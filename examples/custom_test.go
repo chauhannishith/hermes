@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/matcornic/hermes"
+	"github.com/chauhannishith/hermes"
 )
 
 func TestGenerateCustomCSSExamples(t *testing.T) {
@@ -17,7 +17,7 @@ func TestGenerateCustomCSSExamples(t *testing.T) {
 		Product: hermes.Product{
 			Name: "Hermes",
 			Link: "https://example-hermes.com/",
-			Logo: "https://github.com/matcornic/hermes/blob/master/examples/gopher.png?raw=true",
+			Logo: "https://github.com/chauhannishith/hermes/blob/main/examples/gopher.png?raw=true",
 		},
 	}
 

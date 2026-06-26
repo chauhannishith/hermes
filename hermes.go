@@ -93,7 +93,7 @@ type Body struct {
 	FreeMarkdown     Markdown // Free markdown content that replaces all content other than header and footer
 	UnsubscribeLink  string // Optional URL for an unsubscribe link in the email footer
 	UnsubscribeText  string // Optional text for the unsubscribe link (defaults to 'Unsubscribe')
-	CustomCSS        string // Optional CSS overrides (file path, URL, or inline). Restyles the default layout only; email structure and content come from Hermes, Product, and Body fields below.
+	CustomCSS        string // CSS overrides: file path, URL, or inline. Restyles default layout; content uses Hermes, Product, and Body fields only.
 }
 
 // ToHTML converts Markdown to HTML
