@@ -5,7 +5,7 @@ Hi Jon Snow,
 > 
 > 
 > 
-> Hermes service will shutdown the *1st August 2017* for maintenance
+> Hermes service will shutdown the *1st August 2025* for maintenance
 > operations.
 > 
 > 
@@ -25,4 +25,4 @@ Feel free to contact us for any question regarding this matter at support@hermes
 Yours truly,
 Hermes - https://example-hermes.com/
 
-Copyright © 2025 Hermes. All rights reserved.
+Copyright © 2026 Hermes. All rights reserved.
