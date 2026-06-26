@@ -1,7 +1,9 @@
 package hermes
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -577,7 +579,8 @@ func TestHermes_Default(t *testing.T) {
 	assert.Equal(t, TDLeftToRight, h.TextDirection)
 	assert.Equal(t, new(Default), h.Theme)
 	assert.Equal(t, "Hermes", h.Product.Name)
-	assert.Equal(t, "Copyright © 2025 Hermes. All rights reserved.", h.Product.Copyright)
+	assert.Equal(t, fmt.Sprintf("Copyright © %d Hermes. All rights reserved.", time.Now().Year()), h.Product.Copyright)
+	assert.Equal(t, "Hi", h.DefaultGreeting)
 
 	assert.Empty(t, email.Body.Actions)
 	assert.Empty(t, email.Body.Dictionary)
@@ -588,7 +591,34 @@ func TestHermes_Default(t *testing.T) {
 	assert.Empty(t, email.Body.Table.Columns.CustomAlignment)
 	assert.Empty(t, string(email.Body.FreeMarkdown))
 
-	assert.Equal(t, "Hi", email.Body.Greeting)
 	assert.Equal(t, "Yours truly", email.Body.Signature)
 	assert.Empty(t, email.Body.Title)
+	assert.Empty(t, email.Body.Greeting)
+}
+
+func TestHermes_DefaultGreetingOnGenerate(t *testing.T) {
+	t.Parallel()
+
+	h := Hermes{
+		DefaultGreeting: "Dear",
+		Product: Product{
+			Name: "Acme",
+			Link: "http://acme.com",
+		},
+		DisableCSSInlining: true,
+	}
+
+	email := Email{
+		Body: Body{
+			Name: "Jon Snow",
+		},
+	}
+
+	html, err := h.GenerateHTML(email)
+	require.NoError(t, err)
+	assert.Contains(t, html, "Dear Jon Snow")
+
+	plaintext, err := h.GeneratePlainText(email)
+	require.NoError(t, err)
+	assert.Contains(t, plaintext, "Dear Jon Snow")
 }
