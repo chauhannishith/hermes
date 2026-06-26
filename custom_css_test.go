@@ -94,6 +94,7 @@ func TestCustomCSSPartialPropertyMerge(t *testing.T) {
 	if !strings.Contains(lower, "background-color: #ff5722") {
 		t.Error("expected button background override")
 	}
+
 	if !strings.Contains(lower, "border-radius: 3px") {
 		t.Error("expected other .button properties from default theme to remain")
 	}

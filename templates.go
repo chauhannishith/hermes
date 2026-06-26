@@ -28,5 +28,6 @@ func GetDefaultStyles() StylesDefinition {
 	if err != nil {
 		panic(fmt.Sprintf("hermes: read default.css: %v", err))
 	}
+
 	return ParseStylesDefinition(string(cssBytes))
 }

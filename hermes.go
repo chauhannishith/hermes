@@ -153,6 +153,7 @@ func setDefaultEmailValues(e *Email) error {
 			Signature:  "Yours truly",
 		},
 	}
+
 	return mergo.Merge(e, defaultEmail)
 }
 
@@ -175,6 +176,7 @@ func setDefaultHermesValues(h *Hermes) error {
 	if err != nil {
 		return err
 	}
+
 	if h.TextDirection != TDLeftToRight && h.TextDirection != TDRightToLeft {
 		h.TextDirection = defaultTextDirection
 	}
@@ -200,6 +202,7 @@ func (h *Hermes) GeneratePlainText(email Email) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	template, err := h.generateTemplate(email, h.Theme.PlainTextTemplate())
 	if err != nil {
 		return "", err
@@ -233,6 +236,7 @@ func (h *Hermes) generateTemplate(email Email, tplt string) (string, error) {
 	}
 
 	var b bytes.Buffer
+
 	err = t.Execute(&b, Template{*h, email, template.CSS(renderStylesCSS(styles))})
 	if err != nil {
 		return "", err

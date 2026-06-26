@@ -9,6 +9,7 @@ linters:
     - depguard
     - varnamelen
     - wsl
+    - wsl_v5
     - wrapcheck
     - whitespace
     - thelper
@@ -16,10 +17,18 @@ linters:
     - godot
     - mnd
     - gomoddirectives
+    - goconst
+    - paralleltest
+    - noinlineerr
+    - cyclop
   settings:
     gosec:
       excludes:
         - G203 # Use of unescaped data in HTML templates - this packages generates HTML from a template
+        - G706 # Log injection in examples SMTP password prompt
+    modernize:
+      disable-modernize-analyzers:
+        - stringsseq
     lll:
       line-length: 150
     revive:

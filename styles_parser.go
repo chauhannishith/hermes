@@ -1,123 +1,163 @@
 package hermes
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 )
 
+var (
+	errCustomCSSFetchStatus = errors.New("hermes: fetch custom CSS unexpected status")
+	errCustomCSSRead        = errors.New("hermes: read custom CSS")
+)
+
 // ParseStylesDefinition parses a raw CSS string into a StylesDefinition.
 // It supports a very small subset of CSS adequate for simple selector { prop: value; } rules.
-// - Removes standalone comments (/* ... */) but preserves inline comments with selectors
-// - Does not support nested rules, media queries, or at-rules (they should be injected separately)
-// - Multiple selectors separated by commas are split and each receives the full property set
-// Consumers can use this to transform their custom CSS overrides into a StylesDefinition for merging.
 func ParseStylesDefinition(css string) StylesDefinition {
 	styles := StylesDefinition{}
+	cleanedCSS := stripStandaloneCSSComments(css)
 
+	blockRE := regexp.MustCompile(`(?s)([^{}]+)\{([^{}]+)\}`)
+	matches := blockRE.FindAllStringSubmatch(cleanedCSS, -1)
+
+	for _, m := range matches {
+		mergeCSSBlock(styles, m[1], m[2])
+	}
+
+	return styles
+}
+
+func stripStandaloneCSSComments(css string) string {
 	lines := strings.Split(css, "\n")
-	var cleanedLines []string
+	cleanedLines := make([]string, 0, len(lines))
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "/*") && strings.HasSuffix(trimmed, "*/") && !strings.Contains(trimmed, "{") {
 			continue
 		}
+
 		cleanedLines = append(cleanedLines, line)
 	}
 
-	cleanedCSS := strings.Join(cleanedLines, "\n")
+	return strings.Join(cleanedLines, "\n")
+}
 
-	blockRE := regexp.MustCompile(`(?s)([^{}]+)\{([^{}]+)\}`)
-	matches := blockRE.FindAllStringSubmatch(cleanedCSS, -1)
-	for _, m := range matches {
-		selectorPart := strings.TrimSpace(m[1])
-		propsPart := strings.TrimSpace(m[2])
-		if selectorPart == "" || propsPart == "" {
+func mergeCSSBlock(styles StylesDefinition, selectorPart, propsPart string) {
+	selectorPart = strings.TrimSpace(selectorPart)
+	propsPart = strings.TrimSpace(propsPart)
+	if selectorPart == "" || propsPart == "" {
+		return
+	}
+
+	props := parseCSSProperties(propsPart)
+	if len(props) == 0 {
+		return
+	}
+
+	for _, sel := range strings.Split(selectorPart, ",") {
+		s := strings.TrimSpace(sel)
+		if s == "" {
 			continue
 		}
-		selectors := strings.Split(selectorPart, ",")
-		commentRE := regexp.MustCompile(`(?s)/\*.*?\*/`)
-		propsPartNoComments := commentRE.ReplaceAllString(propsPart, "")
-		decls := strings.Split(propsPartNoComments, ";")
-		props := map[string]any{}
-		for _, d := range decls {
-			d = strings.TrimSpace(d)
-			if d == "" {
-				continue
-			}
-			if colon := strings.Index(d, ":"); colon != -1 {
-				key := strings.TrimSpace(d[:colon])
-				val := strings.TrimSpace(d[colon+1:])
-				if key != "" && val != "" {
-					props[key] = val
-				}
-			}
-		}
-		if len(props) == 0 {
+
+		if existing, ok := styles[s]; ok {
+			maps.Copy(existing, props)
+
 			continue
 		}
-		for _, sel := range selectors {
-			s := strings.TrimSpace(sel)
-			if s == "" {
-				continue
-			}
-			if existing, ok := styles[s]; ok {
-				for k, v := range props {
-					existing[k] = v
-				}
-			} else {
-				cp := map[string]any{}
-				for k, v := range props {
-					cp[k] = v
-				}
-				styles[s] = cp
-			}
+
+		cp := map[string]any{}
+		maps.Copy(cp, props)
+		styles[s] = cp
+	}
+}
+
+func parseCSSProperties(propsPart string) map[string]any {
+	commentRE := regexp.MustCompile(`(?s)/\*.*?\*/`)
+	propsPartNoComments := commentRE.ReplaceAllString(propsPart, "")
+	props := map[string]any{}
+
+	for _, d := range strings.Split(propsPartNoComments, ";") {
+		d = strings.TrimSpace(d)
+		if d == "" {
+			continue
+		}
+
+		key, val, ok := strings.Cut(d, ":")
+		if !ok {
+			continue
+		}
+
+		key = strings.TrimSpace(key)
+		val = strings.TrimSpace(val)
+		if key != "" && val != "" {
+			props[key] = val
 		}
 	}
-	return styles
+
+	return props
 }
 
 // loadCustomCSS reads CSS from a URL, file path, or treats the input as inline CSS.
 func loadCustomCSS(source string) (string, error) {
 	if strings.HasPrefix(source, "http://") || strings.HasPrefix(source, "https://") {
-		resp, err := http.Get(source)
-		if err != nil {
-			return "", fmt.Errorf("hermes: fetch custom CSS: %w", err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			return "", fmt.Errorf("hermes: fetch custom CSS: status %d", resp.StatusCode)
-		}
-		b, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return "", fmt.Errorf("hermes: read custom CSS: %w", err)
-		}
-		return string(b), nil
+		return loadCustomCSSFromURL(source)
 	}
 
-	if b, err := os.ReadFile(source); err == nil {
+	if b, err := os.ReadFile(source); err == nil { //nolint:gosec // user-provided theme override path
 		return string(b), nil
 	}
 
 	return source, nil
 }
 
+func loadCustomCSSFromURL(source string) (string, error) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, source, nil)
+	if err != nil {
+		return "", fmt.Errorf("hermes: fetch custom CSS: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("hermes: fetch custom CSS: %w", err)
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("%w: %d", errCustomCSSFetchStatus, resp.StatusCode)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("%w: %w", errCustomCSSRead, err)
+	}
+
+	return string(b), nil
+}
+
 func mergeStylesWithTheme(overrides StylesDefinition, theme Theme) StylesDefinition {
 	themeStyles := theme.Styles()
+
 	for sel, props := range overrides {
 		if defProps, exists := themeStyles[sel]; exists {
-			for k, v := range props {
-				defProps[k] = v
-			}
+			maps.Copy(defProps, props)
 			themeStyles[sel] = defProps
-		} else {
-			themeStyles[sel] = props
+
+			continue
 		}
+
+		themeStyles[sel] = props
 	}
+
 	return themeStyles
 }
 
@@ -151,14 +191,19 @@ const defaultMediaQueries = `
 
 func renderStylesCSS(styles StylesDefinition) string {
 	var b strings.Builder
+
 	for selector, props := range styles {
 		b.WriteString(selector)
 		b.WriteString(" {\n")
+
 		for key, val := range props {
 			fmt.Fprintf(&b, "  %s: %v;\n", key, val)
 		}
+
 		b.WriteString("}\n\n")
 	}
+
 	b.WriteString(defaultMediaQueries)
+
 	return b.String()
 }

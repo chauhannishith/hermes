@@ -26,57 +26,70 @@ func TestGenerateCustomCSSExamples(t *testing.T) {
 		t.Fatalf("resolve custom.css: %v", err)
 	}
 
-	examples := []example{
+	for _, e := range []example{
 		new(welcome),
 		new(reset),
 		new(receipt),
 		new(maintenance),
 		new(inviteCode),
+	} {
+		writeCustomExample(t, h, e, cssPath)
 	}
+}
+
+func writeCustomExample(t *testing.T, h hermes.Hermes, e example, cssPath string) {
+	t.Helper()
 
 	const outDir = "custom"
 
-	for _, e := range examples {
-		email := e.Email()
-		email.Body.CustomCSS = cssPath
+	email := e.Email()
+	email.Body.CustomCSS = cssPath
 
-		html, err := h.GenerateHTML(email)
-		if err != nil {
-			t.Fatalf("GenerateHTML(%s): %v", e.Name(), err)
-		}
+	html, err := h.GenerateHTML(email)
+	if err != nil {
+		t.Fatalf("GenerateHTML(%s): %v", e.Name(), err)
+	}
 
-		txt, err := h.GeneratePlainText(email)
-		if err != nil {
-			t.Fatalf("GeneratePlainText(%s): %v", e.Name(), err)
-		}
+	txt, err := h.GeneratePlainText(email)
+	if err != nil {
+		t.Fatalf("GeneratePlainText(%s): %v", e.Name(), err)
+	}
 
-		if err := os.MkdirAll(outDir, 0750); err != nil {
-			t.Fatalf("mkdir %s: %v", outDir, err)
-		}
+	err = os.MkdirAll(outDir, 0750)
+	if err != nil {
+		t.Fatalf("mkdir %s: %v", outDir, err)
+	}
 
-		htmlFile := fmt.Sprintf("%s/%s.%s.html", outDir, outDir, e.Name())
-		if err := os.WriteFile(htmlFile, []byte(html), 0600); err != nil {
-			t.Fatalf("write %s: %v", htmlFile, err)
-		}
+	htmlFile := fmt.Sprintf("%s/%s.%s.html", outDir, outDir, e.Name())
+	err = os.WriteFile(htmlFile, []byte(html), 0600)
+	if err != nil {
+		t.Fatalf("write %s: %v", htmlFile, err)
+	}
 
-		txtFile := fmt.Sprintf("%s/%s.%s.txt", outDir, outDir, e.Name())
-		if err := os.WriteFile(txtFile, []byte(txt), 0600); err != nil {
-			t.Fatalf("write %s: %v", txtFile, err)
-		}
+	txtFile := fmt.Sprintf("%s/%s.%s.txt", outDir, outDir, e.Name())
+	err = os.WriteFile(txtFile, []byte(txt), 0600)
+	if err != nil {
+		t.Fatalf("write %s: %v", txtFile, err)
+	}
 
-		if !strings.Contains(strings.ToLower(html), "#f3e5f5") {
-			t.Errorf("%s: expected custom.css email-body background in generated HTML", htmlFile)
-		}
+	assertCustomCSSApplied(t, htmlFile, e.Name(), html)
+}
 
-		if e.Name() == "welcome" || e.Name() == "reset" {
-			lower := strings.ToLower(html)
-			if !strings.Contains(lower, "border-radius:24px") && !strings.Contains(lower, "border-radius: 24px") {
-				t.Errorf("%s: expected custom.css pill button style in generated HTML", htmlFile)
-			}
-		}
+func assertCustomCSSApplied(t *testing.T, htmlFile, name, html string) {
+	t.Helper()
 
-		if e.Name() == "invite_code" && !strings.Contains(strings.ToLower(html), "#e1bee7") {
-			t.Errorf("%s: expected custom.css invite-code background in generated HTML", htmlFile)
+	lower := strings.ToLower(html)
+	if !strings.Contains(lower, "#f3e5f5") {
+		t.Errorf("%s: expected custom.css email-body background in generated HTML", htmlFile)
+	}
+
+	if name == "welcome" || name == "reset" {
+		if !strings.Contains(lower, "border-radius:24px") && !strings.Contains(lower, "border-radius: 24px") {
+			t.Errorf("%s: expected custom.css pill button style in generated HTML", htmlFile)
 		}
+	}
+
+	if name == "invite_code" && !strings.Contains(lower, "#e1bee7") {
+		t.Errorf("%s: expected custom.css invite-code background in generated HTML", htmlFile)
 	}
 }

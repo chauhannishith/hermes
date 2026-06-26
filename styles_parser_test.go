@@ -14,6 +14,7 @@ func TestParseStylesDefinitionBasic(t *testing.T) {
 	if styles["body"]["color"] != "#111" {
 		t.Fatalf("expected body color, got %#v", styles["body"])
 	}
+
 	if styles[".a"]["font-size"] != "14px" || styles[".b"]["font-size"] != "14px" {
 		t.Fatalf("expected shared font-size for .a and .b, got %#v", styles)
 	}
@@ -23,9 +24,11 @@ func TestRenderStylesCSSIncludesMediaQueries(t *testing.T) {
 	css := renderStylesCSS(StylesDefinition{
 		"body": {"color": "#111"},
 	})
+
 	if !strings.Contains(css, "body {\n  color: #111;\n}") {
 		t.Fatal("expected selector block in rendered CSS")
 	}
+
 	if !strings.Contains(css, "@media only screen and (max-width: 600px)") {
 		t.Fatal("expected responsive media queries in rendered CSS")
 	}
@@ -39,6 +42,7 @@ span { missing colon }`
 	if styles["div"]["color"] != "red" {
 		t.Fatal("expected div color red")
 	}
+
 	if _, ok := styles["span"]; ok {
 		t.Fatal("expected malformed span rule to be ignored")
 	}
