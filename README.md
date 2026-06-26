@@ -162,10 +162,6 @@ The following open-source themes are bundled with this package:
 
 <img src="screens/default/welcome.png" height="200" /> <img src="screens/default/reset.png" height="200" /> <img src="screens/default/receipt.png" height="200" />
 
-* `flat`, slightly modified from [Postmark Transactional Email Templates](https://github.com/wildbit/postmark-templates)
-
-<img src="screens/flat/welcome.png" height="200" /> <img src="screens/flat/reset.png" height="200" /> <img src="screens/flat/receipt.png" height="200" />
-
 ## RTL Support
 
 To change the default text direction (left-to-right), simply override it as follows:

@@ -295,7 +295,7 @@ A good practice is to describe action in footer in case of problem when displayi
 ```
 
 Be aware that Outlook HTML engine is very old and is not compatible with many CSS features.
-It means, if you want to create a button, the best solution is to create a case only for Outlook. For example, in flat theme, the following code is used to create a button which is a Microsoft VML rectangle. It will not be as perfect as pure CSS interpreted by recent engines, but it will do the work.
+It means, if you want to create a button, the best solution is to create a case only for Outlook. For example, the default theme uses the following code to create a button which is a Microsoft VML rectangle. It will not be as perfect as pure CSS interpreted by recent engines, but it will do the work.
 
 ```
 {{safe "<!--[if mso]>" }}
