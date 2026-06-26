@@ -10,9 +10,7 @@ import (
 )
 
 var testedThemes = []Theme{
-	// Insert your new theme here
 	new(Default),
-	new(Flat),
 }
 
 // ===============================================

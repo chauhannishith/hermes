@@ -50,7 +50,6 @@ func main() {
 
 	themes := []hermes.Theme{
 		new(hermes.Default),
-		new(hermes.Flat),
 	}
 
 	// Generate emails
