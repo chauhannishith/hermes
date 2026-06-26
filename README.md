@@ -178,12 +178,24 @@ h := hermes.Hermes {
 
 ## Language Customizations
 
-To customize the e-mail's greeting ("Hi") or signature ("Yours truly"), supply custom strings within the e-mail's `Body`:
+Set a default greeting for all emails on `Hermes`, or override it per email on `Body`. The default greeting is `Hi`.
+
+```go
+h := hermes.Hermes{
+    DefaultGreeting: "Dear",
+    Product: hermes.Product{
+        Name: "Acme",
+        Link: "https://example.com/",
+    },
+}
+```
+
+Per-email overrides:
 
 ```go
 email := hermes.Email{
     Body: hermes.Body{
-        Greeting:  "Dear",
+        Greeting:  "Hello",
         Signature: "Sincerely",
     },
 }
@@ -210,7 +222,7 @@ email := hermes.Email{
 }
 ```
 
-To customize the `Copyright`, override it when initializing `Hermes` within your `Product` as follows:
+To customize the `Copyright`, override it when initializing `Hermes` within your `Product` as follows. If omitted, the default copyright uses the current year automatically:
 
 ```go
 // Configure hermes by setting a theme and your product info
@@ -221,7 +233,7 @@ h := hermes.Hermes{
         // Appears in header & footer of e-mails
         Name: "Hermes",
         Link: "https://example-hermes.com/",
-        // Custom copyright notice
+        // Custom copyright notice (year is auto-filled in the default when Copyright is omitted)
         Copyright: "Copyright © 2025 Dharma Initiative. All rights reserved."
     },
 }
