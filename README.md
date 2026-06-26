@@ -118,7 +118,7 @@ Hermes - https://example-hermes.com/
 Copyright © 2025 Hermes. All rights reserved.
 ```
 
-> Theme templates will be embedded in your application binary. If you want to use external templates (for configuration), use your own theme by implementing `hermes.Theme` interface with code searching for your files.
+> Theme templates are embedded in your application binary. To use your own layout or load templates from files, implement a [custom theme](#custom-themes).
 
 ## More Examples
 
@@ -162,6 +162,26 @@ The following open-source themes are bundled with this package:
 * `default` by [Postmark Transactional Email Templates](https://github.com/wildbit/postmark-templates)
 
 <img src="screens/default/welcome.png" height="200" /> <img src="screens/default/reset.png" height="200" /> <img src="screens/default/receipt.png" height="200" />
+
+### Custom themes
+
+Only the `default` theme ships with this package. To change the **layout** (not just colors or fonts), implement `hermes.Theme` and pass it when creating Hermes:
+
+```go
+h := hermes.Hermes{
+    Theme: new(MyCustomTheme), // see default.go for the interface
+    Product: hermes.Product{
+        Name: "Acme",
+        Link: "https://example.com/",
+    },
+}
+```
+
+Your theme must provide HTML and plain-text templates plus base styles. Templates receive `Hermes`, `Email`, and `StylesCSS` — use the injection snippets so `Body` fields (intros, actions, table, etc.) render correctly.
+
+**Full guide:** [Using a Custom Theme](CONTRIBUTING.md#using-a-custom-theme) in [CONTRIBUTING.md](CONTRIBUTING.md) (interface methods, template snippets, built-in theme checklist).
+
+For **styling only** on the default layout, use [`CustomCSS`](#custom-css-overrides) instead — no custom theme required.
 
 ## RTL Support
 
@@ -285,19 +305,23 @@ h := hermes.Hermes{
 
 ### Custom CSS overrides
 
-To restyle the default theme without forking it, set `CustomCSS` on `Body`. Hermes loads your stylesheet from a **file path**, **URL**, or treats the value as **inline CSS**. Only selectors you define are merged on top of the default theme — everything else stays unchanged.
+Hermes keeps a **fixed email layout** (header, body sections, footer). You customize **appearance** with CSS; **content** is set only through the existing API — `Hermes.Product`, `Body.Name`, `Body.Intros`, `Body.Actions`, and the other fields documented below. There is no per-email HTML template override.
+
+Set `CustomCSS` on `Body` to load a stylesheet from a **file path**, **URL**, or as **inline CSS**. Only selectors you define are merged on top of the default theme — the structure and which values appear stay the same.
 
 ```go
 email := hermes.Email{
     Body: hermes.Body{
         Name:      "Jon Snow",
         Intros:    []string{"Welcome!"},
-        CustomCSS: "brand.css", // or "https://cdn.example.com/email.css"
+        CustomCSS: "brand.css", // restyle .button, body, h1, etc.
     },
 }
 ```
 
-Example override file: [`examples/custom.css`](examples/custom.css) (purple brand palette, pill buttons).
+Use the class names from the default theme (e.g. `.button`, `.email-body`, `.content-cell`) in your CSS file. See [`examples/custom.css`](examples/custom.css).
+
+For a completely different layout, see [Custom themes](#custom-themes) or [CONTRIBUTING.md — Using a Custom Theme](CONTRIBUTING.md#using-a-custom-theme).
 
 **Test that overrides work**
 
@@ -487,7 +511,7 @@ This is helpful when your application needs sending e-mails, wrote on-the-fly by
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md). To add your own email layout, start with [Using a Custom Theme](CONTRIBUTING.md#using-a-custom-theme).
 
 ## Continuous integration
 
