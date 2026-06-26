@@ -183,8 +183,18 @@ To customize the e-mail's greeting ("Hi") or signature ("Yours truly"), supply c
 ```go
 email := hermes.Email{
     Body: hermes.Body{
-        Greeting: "Dear",
+        Greeting:  "Dear",
         Signature: "Sincerely",
+    },
+}
+```
+
+To omit the greeting from the title line, set `DisableGreeting` to `true`. The recipient name still appears unless `Title` is set:
+
+```go
+email := hermes.Email{
+    Body: hermes.Body{
+        DisableGreeting: true,
     },
 }
 ```
