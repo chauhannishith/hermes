@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chauhannishith/hermes"
+	"github.com/chauhannishith/hermes/v2"
 )
 
 func TestGenerateCustomCSSExamples(t *testing.T) {

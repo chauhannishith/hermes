@@ -1,4 +1,4 @@
-module github.com/chauhannishith/hermes
+module github.com/chauhannishith/hermes/v2
 
 go 1.25
 

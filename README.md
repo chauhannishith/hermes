@@ -1,10 +1,10 @@
 # Hermes
 
 [![Build Status](https://github.com/chauhannishith/hermes/actions/workflows/main.yml/badge.svg)](https://github.com/chauhannishith/hermes/actions/workflows/main.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/chauhannishith/hermes)](https://goreportcard.com/report/github.com/chauhannishith/hermes)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/chauhannishith/hermes.svg)](https://pkg.go.dev/github.com/chauhannishith/hermes)
+[![Go Report Card](https://goreportcard.com/badge/github.com/chauhannishith/hermes/v2)](https://goreportcard.com/report/github.com/chauhannishith/hermes/v2)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/chauhannishith/hermes/v2.svg)](https://pkg.go.dev/github.com/chauhannishith/hermes/v2)
 
-> **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional greeting, signature, and unsubscribe controls. Install this fork with `go get github.com/chauhannishith/hermes`.
+> **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional greeting, signature, and unsubscribe controls. Install with `go get github.com/chauhannishith/hermes/v2@v2.1.1`.
 
 Hermes is the Go port of the great [mailgen](https://github.com/eladnava/mailgen) engine for Node.js. Check their work, it's awesome!
 It's a package that generates clean, responsive HTML e-mails for sending transactional e-mails (welcome e-mails, reset password e-mails, receipt e-mails and so on), and associated plain text fallback.
@@ -18,20 +18,27 @@ It's a package that generates clean, responsive HTML e-mails for sending transac
 First install the package:
 
 ```
-go get github.com/chauhannishith/hermes
+go get github.com/chauhannishith/hermes/v2@v2.1.1
+```
+
+Import path:
+
+```go
+import "github.com/chauhannishith/hermes/v2"
 ```
 
 ## Migrate from upstream `matcornic/hermes`
 
-This fork uses module path `github.com/chauhannishith/hermes`. If you were on the original package:
+This fork is a **v2 module** (`github.com/chauhannishith/hermes/v2`). If you were on the original package:
 
 ```bash
-go get github.com/chauhannishith/hermes@v1.0.0
+go get github.com/chauhannishith/hermes/v2@v2.1.1
 ```
 
-Replace imports from `github.com/matcornic/hermes` to `github.com/chauhannishith/hermes` in your code.
+Replace imports:
 
-If you still use the upstream `v2` module path (`github.com/matcornic/hermes/v2`), see [upstream migration notes](https://github.com/matcornic/hermes#migrate-back-from-v2-to-v130).
+- `github.com/matcornic/hermes` → `github.com/chauhannishith/hermes/v2`
+- `github.com/matcornic/hermes/v2` → `github.com/chauhannishith/hermes/v2`
 
 ## Use Hermes
 

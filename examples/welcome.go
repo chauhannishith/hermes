@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/chauhannishith/hermes"
+	"github.com/chauhannishith/hermes/v2"
 )
 
 type welcome struct {
