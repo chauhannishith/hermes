@@ -1,7 +1,10 @@
 name: lint
 on:
   pull_request:
-    types: [opened, synchronize] # triggered for new PR and new commits in existing PRs
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
 permissions:
   contents: read
   pull-requests: write
