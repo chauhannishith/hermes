@@ -1,9 +1,11 @@
 # Hermes
 
-[![Build Status](https://github.com/matcornic/hermes/actions/workflows/main.yml/badge.svg)](https://github.com/matcornic/hermes/actions/workflows/main.yml)
+[![Build Status](https://github.com/chauhannishith/hermes/actions/workflows/main.yml/badge.svg)](https://github.com/chauhannishith/hermes/actions/workflows/main.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/matcornic/hermes)](https://goreportcard.com/report/github.com/matcornic/hermes)
 [![Godoc](https://godoc.org/github.com/matcornic/hermes?status.svg)](https://godoc.org/github.com/matcornic/hermes)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes?ref=badge_shield)
+
+> **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional unsubscribe links and signature control. Install this fork with `go get github.com/chauhannishith/hermes`.
 
 Hermes is the Go port of the great [mailgen](https://github.com/eladnava/mailgen) engine for Node.js. Check their work, it's awesome!
 It's a package that generates clean, responsive HTML e-mails for sending transactional e-mails (welcome e-mails, reset password e-mails, receipt e-mails and so on), and associated plain text fallback.
@@ -17,7 +19,7 @@ It's a package that generates clean, responsive HTML e-mails for sending transac
 First install the package:
 
 ```
-go get github.com/matcornic/hermes@v1.3.0
+go get github.com/chauhannishith/hermes
 ```
 
 ## Migrate back from `v2` to `v1.3.0`
@@ -183,8 +185,29 @@ To customize the e-mail's greeting ("Hi") or signature ("Yours truly"), supply c
 ```go
 email := hermes.Email{
     Body: hermes.Body{
-        Greeting: "Dear",
+        Greeting:  "Dear",
         Signature: "Sincerely",
+    },
+}
+```
+
+To omit the signature line entirely, set `DisableSignature` to `true`. The product name still appears in the closing block:
+
+```go
+email := hermes.Email{
+    Body: hermes.Body{
+        DisableSignature: true,
+    },
+}
+```
+
+To add an optional unsubscribe link in the email footer, set `UnsubscribeLink` on `Body`. Use `UnsubscribeText` to customize the link label (defaults to `Unsubscribe`):
+
+```go
+email := hermes.Email{
+    Body: hermes.Body{
+        UnsubscribeLink: "https://example.com/unsubscribe?token=abc",
+        UnsubscribeText: "Manage email preferences", // optional
     },
 }
 ```
@@ -416,6 +439,10 @@ This is helpful when your application needs sending e-mails, wrote on-the-fly by
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Continuous integration
+
+This fork runs [GitHub Actions](.github/workflows/) on every push and pull request (build, test, and lint). If workflows do not run after forking, enable them under **Settings → Actions → General** on your GitHub fork.
 
 ## License
 
