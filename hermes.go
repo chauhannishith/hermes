@@ -22,9 +22,12 @@ type Hermes struct {
 	DisableCSSInlining bool
 }
 
+type StylesDefinition map[string]map[string]any
+
 // Theme is an interface to implement when creating a new theme
 type Theme interface {
 	Name() string              // The name of the theme
+	Styles() StylesDefinition  // The CSS styles definition for the theme
 	HTMLTemplate() string      // The golang template for HTML emails
 	PlainTextTemplate() string // The golang templte for plain text emails (can be basic HTML)
 }
@@ -35,6 +38,14 @@ type TextDirection string
 var templateFuncs = template.FuncMap{
 	"url": func(s string) template.URL {
 		return template.URL(s)
+	},
+	"css": func(in any) template.CSS {
+		s, ok := in.(string)
+		if !ok {
+			return ""
+		}
+
+		return template.CSS(s)
 	},
 }
 
@@ -80,8 +91,9 @@ type Body struct {
 	DisableSignature bool     // When true, omit the signature from the email body
 	Title            string   // Title replaces the greeting+name when set
 	FreeMarkdown     Markdown // Free markdown content that replaces all content other than header and footer
-	UnsubscribeLink  string   // Optional URL for an unsubscribe link in the email footer
-	UnsubscribeText  string   // Optional text for the unsubscribe link (defaults to 'Unsubscribe')
+	UnsubscribeLink  string // Optional URL for an unsubscribe link in the email footer
+	UnsubscribeText  string // Optional text for the unsubscribe link (defaults to 'Unsubscribe')
+	CustomCSS        string // Optional CSS overrides: URL, file path, or inline CSS (selectors merge into the default theme)
 }
 
 // ToHTML converts Markdown to HTML
@@ -129,10 +141,10 @@ type Button struct {
 type Template struct {
 	Hermes Hermes
 	Email  Email
+	Styles StylesDefinition
 }
 
 func setDefaultEmailValues(e *Email) error {
-	// Default values of an email
 	defaultEmail := Email{
 		Body: Body{
 			Intros:     []string{},
@@ -141,8 +153,6 @@ func setDefaultEmailValues(e *Email) error {
 			Signature:  "Yours truly",
 		},
 	}
-	// Merge the given email with default one
-	// Default one overrides all zero values
 	return mergo.Merge(e, defaultEmail)
 }
 
@@ -208,6 +218,11 @@ func (h *Hermes) generateTemplate(email Email, tplt string) (string, error) {
 		email.Body.Greeting = h.DefaultGreeting
 	}
 
+	styles, err := resolveEmailStyles(h.Theme, email.Body.CustomCSS)
+	if err != nil {
+		return "", err
+	}
+
 	// Generate the email from Golang template
 	// Allow usage of simple function from sprig : https://github.com/Masterminds/sprig
 	t, err := template.New("hermes").Funcs(sprig.FuncMap()).Funcs(templateFuncs).Funcs(template.FuncMap{
@@ -218,7 +233,7 @@ func (h *Hermes) generateTemplate(email Email, tplt string) (string, error) {
 	}
 
 	var b bytes.Buffer
-	err = t.Execute(&b, Template{*h, email})
+	err = t.Execute(&b, Template{*h, email, styles})
 	if err != nil {
 		return "", err
 	}
