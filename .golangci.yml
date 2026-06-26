@@ -1,5 +1,7 @@
+version: "2"
+
 linters:
-  enable-all: true
+  default: all
   disable:
     - gochecknoglobals
     - funlen
@@ -14,31 +16,28 @@ linters:
     - godot
     - mnd
     - gomoddirectives
-
-linters-settings:
-  gosec:
-    excludes:
-      - G203 # Use of unescaped data in HTML templates - this packages generates HTML from a template
-  lll:
-    line-length: 150
-  revive:
+  settings:
+    gosec:
+      excludes:
+        - G203 # Use of unescaped data in HTML templates - this packages generates HTML from a template
+    lll:
+      line-length: 150
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+  exclusions:
     rules:
-      - name: package-comments
-        disabled: true
+      - path: _test\.go
+        linters:
+          - lll
+      - path: default\.go
+        linters:
+          - lll
+      - path: examples/maintenance\.go
+        linters:
+          - lll
 
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - lll
-    - path: flat\.go
-      linters:
-        - lll
-    - path: default\.go
-      linters:
-        - lll
-    - path: examples/maintenance\.go
-      linters:
-        - lll
