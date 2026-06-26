@@ -254,6 +254,40 @@ func (ed *WithSignatureDifferentThanDefault) assertPlainTextContent(t *testing.T
 	assert.Contains(t, r, "Best regards", "Should have greeting with Dear")
 }
 
+type WithDisabledSignature struct {
+	theme Theme
+}
+
+func (ed *WithDisabledSignature) getExample() (Hermes, Email) {
+	h := Hermes{
+		Theme: ed.theme,
+		Product: Product{
+			Name: "Hermes",
+			Link: "http://hermes.com",
+		},
+		DisableCSSInlining: true,
+	}
+
+	email := Email{
+		Body{
+			Name:             "Jon Snow",
+			DisableSignature: true,
+		},
+	}
+
+	return h, email
+}
+
+func (ed *WithDisabledSignature) assertHTMLContent(t *testing.T, r string) {
+	assert.NotContains(t, r, "Yours truly", "Signature: Should not render the default signature")
+	assert.Contains(t, r, "Hermes", "Product: Should still render the product name")
+}
+
+func (ed *WithDisabledSignature) assertPlainTextContent(t *testing.T, r string) {
+	assert.NotContains(t, r, "Yours truly", "Signature: Should not render the default signature")
+	assert.Contains(t, r, "Hermes", "Product: Should still render the product name")
+}
+
 type WithInviteCode struct {
 	theme Theme
 }
@@ -427,6 +461,16 @@ func TestThemeWithGreetingDiffrentThanDefault(t *testing.T) {
 		t.Run(theme.Name(), func(t *testing.T) {
 			t.Parallel()
 			checkExample(t, &WithSignatureDifferentThanDefault{theme})
+		})
+	}
+}
+
+func TestThemeWithDisabledSignature(t *testing.T) {
+	t.Parallel()
+	for _, theme := range testedThemes {
+		t.Run(theme.Name(), func(t *testing.T) {
+			t.Parallel()
+			checkExample(t, &WithDisabledSignature{theme})
 		})
 	}
 }
