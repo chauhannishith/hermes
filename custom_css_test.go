@@ -52,9 +52,12 @@ func TestCustomCSSFromExampleFile(t *testing.T) {
 	// Overrides from examples/custom.css
 	for _, want := range []string{
 		"background-color: #ede7f6",
+		"background-color: #f3e5f5",
 		"color: #4a148c",
-		"color: #6a1b9a",
+		"color: #9c27b0",
 		"background-color: #7b1fa2",
+		"border-radius: 24px",
+		"border-top: 2px solid #ce93d8",
 	} {
 		if !strings.Contains(lower, want) {
 			t.Errorf("expected override from %s to contain %q", exampleCustomCSS, want)
@@ -63,7 +66,7 @@ func TestCustomCSSFromExampleFile(t *testing.T) {
 
 	// Default styles for selectors not in custom.css
 	for _, want := range []string{
-		"background-color: #fff",
+		"width: 570px",
 		"font-family:",
 		".email-body_inner",
 	} {
