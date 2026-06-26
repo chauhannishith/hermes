@@ -127,8 +127,9 @@ Copyright © 2025 Hermes. All rights reserved.
 * [Receipt](examples/receipt.go)
 * [Password Reset](examples/reset.go)
 * [Maintenance](examples/maintenance.go)
+* [Sample custom CSS overrides](examples/custom.css) — see [Custom CSS overrides](#custom-css-overrides) for usage and testing
 
-To run the examples, go to `examples` folder, then run `go run -a *.go`. HTML and Plaintext example should be created in given theme folders.
+To run the examples, go to `examples` folder, then run `go run .`. HTML and plaintext examples are created in `examples/default/`.
 
 Optionaly you can set the following variables to send automatically the emails to one your mailbox. Nice for testing template in real email clients.
 
@@ -281,6 +282,36 @@ h := hermes.Hermes{
     DisableCSSInlining: true,
 }
 ```
+
+### Custom CSS overrides
+
+To restyle the default theme without forking it, set `CustomCSS` on `Body`. Hermes loads your stylesheet from a **file path**, **URL**, or treats the value as **inline CSS**. Only selectors you define are merged on top of the default theme — everything else stays unchanged.
+
+```go
+email := hermes.Email{
+    Body: hermes.Body{
+        Name:      "Jon Snow",
+        Intros:    []string{"Welcome!"},
+        CustomCSS: "brand.css", // or "https://cdn.example.com/email.css"
+    },
+}
+```
+
+Example override file: [`examples/custom.css`](examples/custom.css) (purple brand palette, pill buttons).
+
+**Test that overrides work**
+
+```bash
+# Unit/integration tests (merge logic + example file)
+go test ./... -run CustomCSS
+
+# Generate preview HTML under examples/custom/ (from repo root)
+go test ./examples/ -run TestGenerateCustomCSSExamples
+```
+
+Open `examples/custom/custom.welcome.html` in a browser and compare with `examples/default/default.welcome.html`.
+
+`go run .` in `examples/` still generates only the default theme — custom previews are produced by the test above.
 
 ## Elements
 
