@@ -139,9 +139,9 @@ type Button struct {
 // Template is the struct given to Golang templating
 // Root object in a template is this struct
 type Template struct {
-	Hermes Hermes
-	Email  Email
-	Styles StylesDefinition
+	Hermes    Hermes
+	Email     Email
+	StylesCSS template.CSS
 }
 
 func setDefaultEmailValues(e *Email) error {
@@ -233,7 +233,7 @@ func (h *Hermes) generateTemplate(email Email, tplt string) (string, error) {
 	}
 
 	var b bytes.Buffer
-	err = t.Execute(&b, Template{*h, email, styles})
+	err = t.Execute(&b, Template{*h, email, template.CSS(renderStylesCSS(styles))})
 	if err != nil {
 		return "", err
 	}

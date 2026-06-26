@@ -133,3 +133,32 @@ func resolveEmailStyles(theme Theme, customCSS string) (StylesDefinition, error)
 
 	return mergeStylesWithTheme(ParseStylesDefinition(raw), theme), nil
 }
+
+const defaultMediaQueries = `
+@media only screen and (max-width: 600px) {
+  .email-body_inner,
+  .email-footer {
+    width: 100% !important;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .button {
+    width: 100% !important;
+  }
+}
+`
+
+func renderStylesCSS(styles StylesDefinition) string {
+	var b strings.Builder
+	for selector, props := range styles {
+		b.WriteString(selector)
+		b.WriteString(" {\n")
+		for key, val := range props {
+			fmt.Fprintf(&b, "  %s: %v;\n", key, val)
+		}
+		b.WriteString("}\n\n")
+	}
+	b.WriteString(defaultMediaQueries)
+	return b.String()
+}
