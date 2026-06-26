@@ -5,7 +5,7 @@
 [![Godoc](https://godoc.org/github.com/matcornic/hermes?status.svg)](https://godoc.org/github.com/matcornic/hermes)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmatcornic%2Fhermes?ref=badge_shield)
 
-> **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional unsubscribe links and signature control. Install this fork with `go get github.com/chauhannishith/hermes`.
+> **Fork:** Maintained fork of [matcornic/hermes](https://github.com/matcornic/hermes) with optional greeting, signature, and unsubscribe controls. Install this fork with `go get github.com/chauhannishith/hermes`.
 
 Hermes is the Go port of the great [mailgen](https://github.com/eladnava/mailgen) engine for Node.js. Check their work, it's awesome!
 It's a package that generates clean, responsive HTML e-mails for sending transactional e-mails (welcome e-mails, reset password e-mails, receipt e-mails and so on), and associated plain text fallback.
@@ -180,13 +180,35 @@ h := hermes.Hermes {
 
 ## Language Customizations
 
-To customize the e-mail's greeting ("Hi") or signature ("Yours truly"), supply custom strings within the e-mail's `Body`:
+Set a default greeting for all emails on `Hermes`, or override it per email on `Body`. The default greeting is `Hi`.
+
+```go
+h := hermes.Hermes{
+    DefaultGreeting: "Dear",
+    Product: hermes.Product{
+        Name: "Acme",
+        Link: "https://example.com/",
+    },
+}
+```
+
+Per-email overrides:
 
 ```go
 email := hermes.Email{
     Body: hermes.Body{
-        Greeting:  "Dear",
+        Greeting:  "Hello",
         Signature: "Sincerely",
+    },
+}
+```
+
+To omit the greeting from the title line, set `DisableGreeting` to `true`. The recipient name still appears unless `Title` is set:
+
+```go
+email := hermes.Email{
+    Body: hermes.Body{
+        DisableGreeting: true,
     },
 }
 ```
@@ -223,7 +245,7 @@ email := hermes.Email{
 }
 ```
 
-To customize the `Copyright`, override it when initializing `Hermes` within your `Product` as follows:
+To customize the `Copyright`, override it when initializing `Hermes` within your `Product` as follows. If omitted, the default copyright uses the current year automatically:
 
 ```go
 // Configure hermes by setting a theme and your product info
@@ -234,7 +256,7 @@ h := hermes.Hermes{
         // Appears in header & footer of e-mails
         Name: "Hermes",
         Link: "https://example-hermes.com/",
-        // Custom copyright notice
+        // Custom copyright notice (year is auto-filled in the default when Copyright is omitted)
         Copyright: "Copyright © 2025 Dharma Initiative. All rights reserved."
     },
 }

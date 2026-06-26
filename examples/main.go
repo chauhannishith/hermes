@@ -31,6 +31,7 @@ type example interface {
 func main() {
 
 	h := hermes.Hermes{
+		DefaultGreeting: "Hi",
 		Product: hermes.Product{
 			Name: "Hermes",
 			Link: "https://example-hermes.com/",

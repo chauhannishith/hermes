@@ -2,7 +2,9 @@ package hermes
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
+	"time"
 
 	"dario.cat/mergo"
 	"github.com/Masterminds/sprig"
@@ -16,6 +18,7 @@ type Hermes struct {
 	Theme              Theme
 	TextDirection      TextDirection
 	Product            Product
+	DefaultGreeting    string // Default greeting for emails (defaults to 'Hi')
 	DisableCSSInlining bool
 }
 
@@ -72,6 +75,7 @@ type Body struct {
 	Actions          []Action // Actions are a list of actions that the user will be able to execute via a button click
 	Outros           []string // Outro sentences, last displayed in the email
 	Greeting         string   // Greeting for the contacted person (default to 'Hi')
+	DisableGreeting  bool     // When true, omit the greeting from the email title
 	Signature        string   // Signature for the contacted person (default to 'Yours truly')
 	DisableSignature bool     // When true, omit the signature from the email body
 	Title            string   // Title replaces the greeting+name when set
@@ -135,7 +139,6 @@ func setDefaultEmailValues(e *Email) error {
 			Dictionary: []Entry{},
 			Outros:     []string{},
 			Signature:  "Yours truly",
-			Greeting:   "Hi",
 		},
 	}
 	// Merge the given email with default one
@@ -147,11 +150,12 @@ func setDefaultEmailValues(e *Email) error {
 func setDefaultHermesValues(h *Hermes) error {
 	defaultTextDirection := TDLeftToRight
 	defaultHermes := Hermes{
-		Theme:         new(Default),
-		TextDirection: defaultTextDirection,
+		Theme:           new(Default),
+		TextDirection:   defaultTextDirection,
+		DefaultGreeting: "Hi",
 		Product: Product{
 			Name:        "Hermes",
-			Copyright:   "Copyright © 2025 Hermes. All rights reserved.",
+			Copyright:   fmt.Sprintf("Copyright © %d Hermes. All rights reserved.", time.Now().Year()),
 			TroubleText: "If you’re having trouble with the button '{ACTION}', copy and paste the URL below into your web browser.",
 		},
 	}
@@ -198,6 +202,10 @@ func (h *Hermes) generateTemplate(email Email, tplt string) (string, error) {
 	err := setDefaultEmailValues(&email)
 	if err != nil {
 		return "", err
+	}
+
+	if email.Body.Greeting == "" {
+		email.Body.Greeting = h.DefaultGreeting
 	}
 
 	// Generate the email from Golang template
