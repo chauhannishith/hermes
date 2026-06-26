@@ -72,8 +72,9 @@ type Body struct {
 	Actions      []Action // Actions are a list of actions that the user will be able to execute via a button click
 	Outros       []string // Outro sentences, last displayed in the email
 	Greeting     string   // Greeting for the contacted person (default to 'Hi')
-	Signature    string   // Signature for the contacted person (default to 'Yours truly')
-	Title        string   // Title replaces the greeting+name when set
+	Signature         string   // Signature for the contacted person (default to 'Yours truly')
+	DisableSignature  bool     // When true, omit the signature from the email body
+	Title             string   // Title replaces the greeting+name when set
 	FreeMarkdown Markdown // Free markdown content that replaces all content other than header and footer
 }
 
